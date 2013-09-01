@@ -9,7 +9,7 @@ A drop in replacement for Django's built-in runserver command. Features include:
 * Threaded (default) and multi-process development servers.
 * Ability to specify a WSGI application as your target environment.
 
-.. note:: django-devserver works on Django 1.3 and newer
+.. note:: django-devserver works on Django 1.5 and newer
 
 ------------
 Installation
