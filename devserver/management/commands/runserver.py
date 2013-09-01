@@ -3,11 +3,12 @@ from django.core.management.commands.runserver import Command as BaseCommand
 from django.core.management.base import CommandError, handle_default_options
 from django.core.servers.basehttp import WSGIServerException, WSGIServer
 from django.core.handlers.wsgi import WSGIHandler
+from django.utils import six
 
 import os
 import sys
 import imp
-import SocketServer
+from six.moves import socketserver
 from optparse import make_option
 
 from devserver.handlers import DevServerHandler
@@ -18,7 +19,7 @@ STATICFILES_APPS = ('django.contrib.staticfiles', 'staticfiles')
 
 
 def null_technical_500_response(request, exc_type, exc_value, tb):
-    raise exc_type, exc_value, tb
+    six.reraise(exc_type, exc_value, tb)
 
 
 def run(addr, port, wsgi_handler, mixin=None, ipv6=False):
@@ -125,7 +126,7 @@ class Command(BaseCommand):
         if use_werkzeug:
             try:
                 from werkzeug import run_simple, DebuggedApplication
-            except ImportError, e:
+            except ImportError as e:
                 self.stderr.write("WARNING: Unable to initialize werkzeug: %s\n" % e)
                 use_werkzeug = False
             else:
@@ -168,9 +169,9 @@ class Command(BaseCommand):
                     raise
 
         if options['use_forked']:
-            mixin = SocketServer.ForkingMixIn
+            mixin = socketserver.ForkingMixIn
         else:
-            mixin = SocketServer.ThreadingMixIn
+            mixin = socketserver.ThreadingMixIn
 
         middleware = getattr(settings, 'DEVSERVER_WSGI_MIDDLEWARE', [])
         for middleware in middleware:
@@ -189,7 +190,7 @@ class Command(BaseCommand):
             else:
                 run(self.addr, int(self.port), app, mixin, ipv6=options['use_ipv6'])
 
-        except WSGIServerException, e:
+        except WSGIServerException as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
                 13: "You don't have permission to access that port.",

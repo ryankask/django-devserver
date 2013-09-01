@@ -52,7 +52,7 @@ class ThreadedTestServerThread(threading.Thread):
             httpd = new(server_address, SlimWSGIRequestHandler)
             httpd.set_app(handler)
             self.started.set()
-        except WSGIServerException, e:
+        except WSGIServerException as e:
             self.error = e
             self.started.set()
             return
