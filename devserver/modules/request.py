@@ -1,4 +1,7 @@
-import urllib
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 
 from devserver.modules import DevServerModule
 
@@ -50,9 +53,9 @@ class RequestDumpModule(DevServerModule):
         if request.META['CONTENT_LENGTH']:
             req += '%s: %s\n' % (self.logger.style.SQL_KEYWORD('Content-Length'), request.META['CONTENT_LENGTH'])
         if request.POST:
-            req += '\n%s\n' % self.logger.style.HTTP_INFO(urllib.urlencode(dict((k, v.encode('utf8')) for k, v in request.POST.items())))
+            req += '\n%s\n' % self.logger.style.HTTP_INFO(urlencode(dict((k, v.encode('utf8')) for k, v in request.POST.items())))
         if request.FILES:
-            req += '\n%s\n' % self.logger.style.HTTP_NOT_MODIFIED(urllib.urlencode(request.FILES))
+            req += '\n%s\n' % self.logger.style.HTTP_NOT_MODIFIED(urlencode(request.FILES))
         self.logger.info('Full request:\n%s', req)
 
 class ResponseDumpModule(DevServerModule):
